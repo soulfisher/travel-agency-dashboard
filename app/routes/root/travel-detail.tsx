@@ -1,9 +1,9 @@
-import type {LoaderFunctionArgs} from "react-router";
+import {Link, type LoaderFunctionArgs} from "react-router";
 import {getAllTrips, getTripById} from "~/appwrite/trips";
-import type { Route } from './+types/trip-detail';
+import type { Route } from './+types/travel-detail';
 import {cn, getFirstWord, parseTripData} from "~/lib/utils";
 import {Header, InfoPill, TripCard} from "../../../components";
-import {ChipDirective, ChipListComponent, ChipsDirective} from "@syncfusion/ej2-react-buttons";
+import {ButtonComponent, ChipDirective, ChipListComponent, ChipsDirective} from "@syncfusion/ej2-react-buttons";
 
 export const loader = async ({ params }: LoaderFunctionArgs ) => {
     const { tripId } = params;
@@ -25,9 +25,9 @@ export const loader = async ({ params }: LoaderFunctionArgs ) => {
     }
 }
 
-const TripDetail = ({loaderData}: Route.ComponentProps) => {
+const TravelDetail = ({loaderData}: Route.ComponentProps) => {
 
-    const imageUrls = loaderData?.trip?.imageUrls || [];
+    const imageUrls = loaderData?.trip?.imageUrls || []
     const tripData = parseTripData(loaderData?.trip?.tripDetail);
 
     const {
@@ -52,28 +52,33 @@ const TripDetail = ({loaderData}: Route.ComponentProps) => {
 
     return (
         <main className="travel-detail wrapper">
-            <Header title="Trip Details" description="View and edit AI-generated travel plans" />
+            <div className="travel-div">
+                <Link to="/" className="back-link">
+                    <img src="/assets/icons/arrow-left.svg" alt="back icon" />
+                    <span>Go back</span>
+                </Link>
+
 
             <section className="container wrapper-md">
                 <header>
                     <h1 className="p-40-semibold text-dark-100">{name}</h1>
                     <div className="flex items-center gap-5">
-                    <InfoPill
-                        text={`${duration} day plan`}
-                        image="/assets/icons/calendar.svg"
-                    />
-                    <InfoPill
-                        text={itinerary?.slice(0,4).map((item) => item.location).join(', ') || ''}
-                        image="/assets/icons/location-mark.svg"
-                    />
+                        <InfoPill
+                            text={`${duration} day plan`}
+                            image="/assets/icons/calendar.svg"
+                        />
+                        <InfoPill
+                            text={itinerary?.slice(0,4).map((item) => item.location).join(', ') || ''}
+                            image="/assets/icons/location-mark.svg"
+                        />
                     </div>
                 </header>
 
                 <section className="gallery">
                     {imageUrls.map((url: string, i: number)=> (
-                        <img src={url} key={i} alt="picture"
-                            className={cn('w-full rounded-xl object-cover', i === 0
-                            ? 'md:col-span-2 md:row-span-2 h-[330px]' : 'md:row-span-1 h-[150px]')}
+                        <img src={url} key={i}
+                             className={cn('w-full rounded-xl object-cover', i === 0
+                                 ? 'md:colspan-2 md:rowspan-2 h-[330px]' : 'md:rowspan-1 h-[150px]')}
                         />
                     ))}
                 </section>
@@ -158,7 +163,19 @@ const TripDetail = ({loaderData}: Route.ComponentProps) => {
                         </div>
                     </section>
                 ))}
+
+                <a>
+                    <ButtonComponent className="button-class">
+                        <span className="p-16-semibold text-white">
+                            Pay to join the trip
+                        </span>
+                        <span className="price-pill">
+                            {estimatedPrice}
+                        </span>
+                    </ButtonComponent>
+                </a>
             </section>
+        </div>
 
             <section className="flex flex-col gap-6">
                 <h2 className="p-24-semibold text-dark-100">Popular Trips</h2>
@@ -180,4 +197,4 @@ const TripDetail = ({loaderData}: Route.ComponentProps) => {
         </main>
     )
 }
-export default TripDetail
+export default TravelDetail

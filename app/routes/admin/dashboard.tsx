@@ -13,8 +13,8 @@ import {
     SplineAreaSeries,
     Tooltip
 } from "@syncfusion/ej2-react-charts";
-import {Inject} from "@syncfusion/ej2-react-grids";
-import {dashboardStats, tripyAxis, userXAxis, useryAxis} from "~/constants";
+import {ColumnDirective, ColumnsDirective, GridComponent, Inject} from "@syncfusion/ej2-react-grids";
+import {dashboardStats, tripXAxis, tripyAxis, userXAxis, useryAxis} from "~/constants";
 
 //const { totalUsers, usersJoined, totalTrips, tripsCreated, userRole } = dashboardStats;
 
@@ -39,12 +39,12 @@ export const clientLoader = async () => {
         id: $id,
         ...parseTripData(tripDetail),
         imageUrls: imageUrls ?? []
-    }));
+    }))
 
     const mappedUsers: UsersItineraryCount[] = allUsers.users.map((user) => ({
         imageUrl: user.imageUrl,
         name: user.name,
-        count: user.itineraryCount
+        count: user.itineraryCount ?? Math.floor(Math.random() * 10)
     }))
 
     return {
@@ -61,6 +61,27 @@ const Dashboard = ({ loaderData } : Route.ComponentProps) => {
 
     const user = loaderData.user as User | null;
     const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } = loaderData;
+
+    const trips = allTrips.map((trip) => ({
+        imageUrl: trip.imageUrls[0],
+        name: trip.name,
+        interest: trip.interests
+    }))
+
+    const usersAndTrips = [
+        {
+            title: 'Latest user signups',
+            dataSource: allUsers,
+            field: 'count',
+            headerText: 'Trips created'
+        },
+        {
+            title: 'Trips based on interests',
+            dataSource: trips,
+            field: 'interest',
+            headerText: 'Interests'
+        }
+    ]
 
     return (
         <main className="dashboard wrapper">
@@ -144,7 +165,7 @@ const Dashboard = ({ loaderData } : Route.ComponentProps) => {
 
                 <ChartComponent
                     id="chart-2"
-                    primaryXAxis={tripyAxis}
+                    primaryXAxis={tripXAxis}
                     primaryYAxis={tripyAxis}
                     title="Trip Trends"
                     tooltip={{ enable: true }}
@@ -164,6 +185,38 @@ const Dashboard = ({ loaderData } : Route.ComponentProps) => {
 
                     </SeriesCollectionDirective>
                 </ChartComponent>
+            </section>
+
+            <section className="user-trip wrapper">
+                {usersAndTrips.map(({ title, dataSource, field, headerText }, i) => (
+                    <div key={i} className="flex flex-col gap-5">
+                        <h3 className="p-20-semibold text-dark-100">{title}</h3>
+
+                        <GridComponent dataSource={dataSource} gridLines="None">
+                            <ColumnsDirective>
+                                <ColumnDirective
+                                    field="name"
+                                    headerText="Name"
+                                    width="200"
+                                    textAlign="Left"
+                                    template={(props: UserData) => (
+                                        <div className="flex items-center gap-1.5 px-4">
+                                            <img src={props.imageUrl} alt="user" className="rounded-full size-8 aspect-square" referrerPolicy="no-referrer" />
+                                            <span>{props.name}</span>
+                                        </div>
+                                    )}
+                                />
+
+                                <ColumnDirective
+                                    field={field}
+                                    headerText={headerText}
+                                    width="150"
+                                    textAlign="Left"
+                                />
+                            </ColumnsDirective>
+                        </GridComponent>
+                    </div>
+                ))}
             </section>
         </main>
     )

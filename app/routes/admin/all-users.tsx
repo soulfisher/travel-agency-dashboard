@@ -3,15 +3,21 @@ import {ColumnsDirective, ColumnDirective, GridComponent} from "@syncfusion/ej2-
 import {cn, formatDate} from "~/lib/utils";
 import {getAllUsers} from "~/appwrite/auth";
 import type {Route} from "./+types/all-users"
+import {appwriteConfig} from "~/appwrite/client";
+//import {users} from "~/constants";
 
 export const loader = async () => {
+
     const { users, total } = await getAllUsers(10, 0);
 
     return { users, total };
 }
 
 const AllUsers = ({ loaderData }: Route.ComponentProps) => {
+
     const { users } = loaderData;
+
+    console.log(users);
 
     return (
         <main className="all-users wrapper">
